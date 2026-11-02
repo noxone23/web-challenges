@@ -62,3 +62,36 @@ describe("assertValidPassword", () => {
     expect(() => assertValidPassword("a b")).toThrow();
   });
 });
+
+describe("validatePassword", () => {
+  test.each([
+    { password: "Secrte123", expectedErrors: [] },
+    { password: "Ab1", expectedErrors: ["Password must have at least 8 characters"]},
+    { password: "Abcdef12", expectedErrors: [] },
+    { password: "Secretabc", expectedErrors: ["Password must contain a digit"] },
+    { password: "secret123", expectedErrors: ["Password must contain an uppercase letter"] },
+    { password: "Secret 123", expectedErrors: ["Password must not contain spaces"] },
+    {
+      password: "a b",
+      expectedErrors: [
+      "Password must have at least 8 characters",
+      "Password must contain a digit",
+      "Password must contain an uppercase letter",
+      "Password must not contain spaces"
+      ]
+    }
+    ])("validates '$password' correctly", ({ password, expectedErrors }) => {
+    const errors = validatePassword(password);
+    expect(errors).toEqual(expectedErrors);
+  });
+});
+
+describe("assertValidPassword", () => {
+  test("does not throw for a valid password", () => {
+    expect(() => assertValidPassword("Secret123")).not.toThrow();
+  });
+
+  test("throws an error that lists the broken rules", () => {
+    expect(() => assertValidPassword("a b")).toThrow();
+  });
+});
